@@ -22,6 +22,7 @@ public class Employee implements Serializable {
     @NotNull
     private Role role;
 
+    //@NotNull
     private String supervisor;
 
     @NotNull

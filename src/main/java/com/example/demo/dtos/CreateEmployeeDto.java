@@ -17,6 +17,7 @@ public class CreateEmployeeDto implements Serializable {
     private String lastName;
     @NotNull
     private Role role;
+    @NotNull
     private String supervisor;
     @Email
     private String email;
