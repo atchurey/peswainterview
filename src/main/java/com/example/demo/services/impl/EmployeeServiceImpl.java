@@ -1,6 +1,8 @@
 package com.example.demo.services.impl;
 
+import com.example.demo.dtos.CreateEmployeeDto;
 import com.example.demo.dtos.EmployeeDto;
+import com.example.demo.dtos.UpdateEmployeeDto;
 import com.example.demo.entities.Employee;
 import com.example.demo.exceptions.ServiceException;
 import com.example.demo.repositories.EmployeeRepository;
@@ -38,12 +40,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeDto createEmployee(EmployeeDto createInvoiceDto) {
+    public EmployeeDto createEmployee(CreateEmployeeDto payload) {
         return null;
     }
 
     @Override
-    public EmployeeDto updateEmployee(EmployeeDto editInvoiceDto) {
+    public EmployeeDto updateEmployee(UpdateEmployeeDto payload) {
         return null;
     }
 

@@ -1,8 +1,10 @@
 package com.example.demo.controllers.v1;
 
 import com.example.demo.domain.ApiResponse;
+import com.example.demo.dtos.CreateEmployeeDto;
 import com.example.demo.dtos.EmployeeDto;
 import com.example.demo.domain.PagedContent;
+import com.example.demo.dtos.UpdateEmployeeDto;
 import com.example.demo.entities.Employee;
 import com.example.demo.services.EmployeeService;
 import com.example.demo.utils.Utils;
@@ -80,7 +82,7 @@ public class EmployeesController {
     @PostMapping()
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<EmployeeDto> createEmployee(@Valid @RequestBody EmployeeDto payload) {
+    public ApiResponse<EmployeeDto> createEmployee(@Valid @RequestBody CreateEmployeeDto payload) {
         logger.info("HTTP REQUEST: createEmployee: {}", payload);
 
         EmployeeDto dto = employeeService.createEmployee(payload);
@@ -93,7 +95,7 @@ public class EmployeesController {
 
     @PutMapping()
     @ResponseBody
-    public ApiResponse<EmployeeDto> updateEmployee(@Valid @RequestBody EmployeeDto payload) {
+    public ApiResponse<EmployeeDto> updateEmployee(@Valid @RequestBody UpdateEmployeeDto payload) {
         logger.info("HTTP REQUEST: updateEmployee: {}", payload);
         EmployeeDto dto = employeeService.updateEmployee(payload);
 

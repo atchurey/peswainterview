@@ -9,13 +9,9 @@ import java.util.Date;
 public class LeaveRequestDto implements Serializable {
 
     public String id;
-    private String approvedBy;
     public String reason;
-    private boolean deleted;
     private Date startAt;
     private Date endAt;
-    private Date deletedAt;
-    private Date approvedAt;
     private Date createdAt;
     private EmployeeDto employee;
 

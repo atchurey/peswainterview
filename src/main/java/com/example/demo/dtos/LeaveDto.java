@@ -1,9 +1,9 @@
-package com.example.demo.entities;
+package com.example.demo.dtos;
 
+import com.example.demo.entities.Employee;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import java.io.Serializable;
@@ -11,23 +11,15 @@ import java.time.LocalDate;
 import java.util.Date;
 
 @Data
-@Document("leave_requests")
-public class LeaveRequest implements Serializable {
+public class LeaveDto implements Serializable {
 
-    @Id
     public String id;
-
+    private String approvedBy;
     public String reason;
-
-    @NotNull
     private LocalDate startAt;
-
-    @NotNull
     private LocalDate endAt;
-
-    @NotNull
+    private Date approvedAt;
     private Date createdAt;
+    private EmployeeDto employee;
 
-    @DocumentReference(lazy=true)
-    private Employee employee;
 }

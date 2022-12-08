@@ -9,33 +9,31 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Date;
-import java.util.List;
 
 @Data
-@Document("employees")
-public class Employee implements Serializable {
+@Document("leave")
+public class Leave implements Serializable {
 
     @Id
     public String id;
 
-    @NotNull
-    public String firstName;
+    public String reason;
 
     @NotNull
-    public String lastName;
+    private LocalDate startAt;
 
     @NotNull
-    public String email;
+    private LocalDate endAt;
 
     @NotNull
-    public String phone;
+    private String approvedBy;
+
+    @NotNull
+    private Date approvedAt;
 
     @NotNull
     private Date createdAt;
 
-    @DocumentReference
-    private List<Leave> leaves;
-
-    @DocumentReference
-    private List<LeaveRequest> leaveRequests;
+    @DocumentReference(lazy=true)
+    private Employee employee;
 }
