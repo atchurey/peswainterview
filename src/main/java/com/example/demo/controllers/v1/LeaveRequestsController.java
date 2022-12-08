@@ -2,9 +2,7 @@ package com.example.demo.controllers.v1;
 
 import com.example.demo.domain.ApiResponse;
 import com.example.demo.domain.PagedContent;
-import com.example.demo.dtos.CreateLeaveRequestDto;
-import com.example.demo.dtos.LeaveRequestDto;
-import com.example.demo.dtos.UpdateLeaveRequestDto;
+import com.example.demo.dtos.*;
 import com.example.demo.entities.LeaveRequest;
 import com.example.demo.services.LeaveRequestService;
 import com.example.demo.utils.Utils;
@@ -87,6 +85,18 @@ public class LeaveRequestsController {
         ApiResponse<LeaveRequestDto> response = Utils.wrapInApiResponse(dto);
 
         logger.info("HTTP RESPONSE: updateLeaveRequest: {}", response);
+        return response;
+    }
+
+    @PostMapping("/approvals")
+    @ResponseBody
+    public ApiResponse<LeaveDto> approveLeaveRequest(@Valid @RequestBody ApproveLeaveRequestDto payload) {
+        logger.info("HTTP REQUEST: approveLeaveRequest: {}", payload);
+        LeaveDto dto = leaveRequestService.approveLeaveRequest(payload);
+
+        ApiResponse<LeaveDto> response = Utils.wrapInApiResponse(dto);
+
+        logger.info("HTTP RESPONSE: approveLeaveRequest: {}", response);
         return response;
     }
 

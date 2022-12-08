@@ -1,5 +1,6 @@
 package com.example.demo.dtos;
 
+import com.example.demo.enums.LeaveStatus;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -8,11 +9,12 @@ import java.io.Serializable;
 public class LeaveDto implements Serializable {
 
     private String id;
-    private String approvedBy;
-    public String reason;
+    private LeaveStatus status;
+    private String attendedToBy;
+    private String reason;
     private String startAt;
     private String endAt;
-    private String approvedAt;
+    private String attendedToAt;
     private String createdAt;
     private EmployeeDto employee;
 

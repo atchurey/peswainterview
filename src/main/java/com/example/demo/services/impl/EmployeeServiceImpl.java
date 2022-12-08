@@ -104,7 +104,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         employee.setRole(payload.getRole() == null ? employee.getRole() : payload.getRole());
-        employee.setSupervisor(Strings.isBlank(payload.getSupervisor()) ? employee.getSupervisor() : payload.getSupervisor());
+        employee.setSupervisor(payload.getSupervisor());
         employee.setFirstName(Strings.isBlank(payload.getFirstName()) ? employee.getFirstName() : payload.getFirstName());
         employee.setLastName(Strings.isBlank(payload.getLastName()) ? employee.getLastName() : payload.getLastName());
         employee.setEmail(Strings.isBlank(payload.getEmail()) ? employee.getEmail() : payload.getEmail());

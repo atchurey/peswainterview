@@ -1,5 +1,6 @@
 package com.example.demo.entities;
 
+import com.example.demo.enums.LeaveStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -26,13 +27,19 @@ public class Leave implements Serializable {
     private LocalDate endAt;
 
     @NotNull
-    private String approvedBy;
+    private LeaveStatus status;
 
     @NotNull
-    private Date approvedAt;
+    private String attendedToBy;
+
+    @NotNull
+    private Date attendedToAt;
 
     @NotNull
     private Date createdAt;
+
+    @NotNull
+    private Date updatedAt;
 
     @DocumentReference(lazy=true)
     private Employee employee;

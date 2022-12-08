@@ -15,9 +15,9 @@ import java.util.Date;
 public class LeaveRequest implements Serializable {
 
     @Id
-    public String id;
+    private String id;
 
-    public String reason;
+    private String reason;
 
     @NotNull
     private LocalDate startAt;
