@@ -10,8 +10,8 @@ import java.time.LocalDate;
 public class UpdateLeaveRequestDto implements Serializable {
 
     @NotNull
-    public String id;
-    public String reason;
+    private String id;
+    private String reason;
     @NotNull
     private LocalDate startAt;
     @NotNull

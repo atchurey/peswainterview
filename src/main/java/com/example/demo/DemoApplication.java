@@ -5,6 +5,7 @@ import com.example.demo.dtos.EmailPayloadDto;
 import com.example.demo.dtos.SmsPayloadDto;
 import com.example.demo.entities.Employee;
 import com.example.demo.entities.LeaveRequest;
+import com.example.demo.enums.Role;
 import com.example.demo.enums.SmsProvider;
 import com.example.demo.notifications.channels.EmailChannel;
 import com.example.demo.notifications.channels.SmsChannel;
@@ -78,8 +79,11 @@ public class DemoApplication implements CommandLineRunner {
 		employee1.setLastName("Somuah");
 		employee1.setEmail("victor@gmail.com");
 		employee1.setPhone("233241500723");
+		employee1.setRole(Role.SUPERVISOR);
+		employee1.setSupervisor(null);
 		employee1.setCreatedAt(nowDate);
-		employeeRepository.save(employee1);
+		employee1.setUpdatedAt(nowDate);
+		employee1 = employeeRepository.save(employee1);
 
 		Employee employee2 = new Employee();
 		employee2.setId("two");
@@ -87,7 +91,10 @@ public class DemoApplication implements CommandLineRunner {
 		employee2.setLastName("Aberor");
 		employee2.setEmail("norbert@gmail.com");
 		employee2.setPhone("233248529145");
+		employee2.setRole(Role.EMPLOYEE);
+		employee2.setSupervisor(employee1.getId());
 		employee2.setCreatedAt(nowDate);
+		employee2.setUpdatedAt(nowDate);
 		employeeRepository.save(employee2);
 
 		List<Employee> employees = Arrays.asList(employee1, employee2);
@@ -97,6 +104,7 @@ public class DemoApplication implements CommandLineRunner {
 			leaveRequest.setId(String.valueOf(i));
 			leaveRequest.setReason("Some reason " + i);
 			leaveRequest.setCreatedAt(nowDate);
+			leaveRequest.setUpdatedAt(nowDate);
 			leaveRequest.setStartAt(nowLocalDate.plusDays(ThreadLocalRandom.current().nextInt(1, 20)));
 			leaveRequest.setEndAt(nowLocalDate.plusDays(ThreadLocalRandom.current().nextInt(20, 100)));
 			leaveRequest.setEmployee(employees.get(ThreadLocalRandom.current().nextInt(0, 2)));

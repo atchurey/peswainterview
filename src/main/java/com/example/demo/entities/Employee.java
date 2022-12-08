@@ -1,5 +1,6 @@
 package com.example.demo.entities;
 
+import com.example.demo.enums.Role;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -16,19 +17,24 @@ import java.util.List;
 public class Employee implements Serializable {
 
     @Id
-    public String id;
+    private String id;
 
     @NotNull
-    public String firstName;
+    private Role role;
+
+    private String supervisor;
 
     @NotNull
-    public String lastName;
+    private String firstName;
 
     @NotNull
-    public String email;
+    private String lastName;
 
     @NotNull
-    public String phone;
+    private String email;
+
+    @NotNull
+    private String phone;
 
     @NotNull
     private Date createdAt;

@@ -4,6 +4,7 @@ import com.example.demo.dtos.CreateEmployeeDto;
 import com.example.demo.dtos.EmployeeDto;
 import com.example.demo.dtos.UpdateEmployeeDto;
 import com.example.demo.entities.Employee;
+import com.example.demo.enums.Role;
 import com.example.demo.exceptions.ServiceException;
 import com.example.demo.repositories.EmployeeRepository;
 import com.example.demo.services.EmployeeService;
@@ -52,12 +53,27 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new ServiceException(100, "Invalid phone number");
         }
 
+        if (Strings.isNotBlank(payload.getSupervisor())) {
+
+            Employee supervisor = employeeRepository.findById(payload.getSupervisor())
+                    .orElseThrow(() -> new ServiceException(100, "Supervisor not found"));
+
+            if (Role.SUPERVISOR != supervisor.getRole()) {
+                throw new ServiceException(100, "Invalid employee provided as supervisor.");
+            }
+        }
+
+        Date now = new Date();
+
         Employee employee = new Employee();
+        employee.setRole(payload.getRole());
+        employee.setSupervisor(payload.getSupervisor());
         employee.setFirstName(payload.getFirstName());
         employee.setLastName(payload.getLastName());
         employee.setEmail(payload.getEmail());
         employee.setPhone(payload.getPhone());
-        employee.setCreatedAt(new Date());
+        employee.setCreatedAt(now);
+        employee.setUpdatedAt(now);
         employee = employeeRepository.save(employee);
 
         return modelMapper.map(employee, EmployeeDto.class);
@@ -77,6 +93,18 @@ public class EmployeeServiceImpl implements EmployeeService {
             }
         }
 
+        if (Strings.isNotBlank(payload.getSupervisor())) {
+
+            Employee supervisor = employeeRepository.findById(payload.getSupervisor())
+                    .orElseThrow(() -> new ServiceException(100, "Supervisor not found"));
+
+            if (Role.SUPERVISOR != supervisor.getRole()) {
+                throw new ServiceException(100, "Invalid employee provided as supervisor.");
+            }
+        }
+
+        employee.setRole(payload.getRole() == null ? employee.getRole() : payload.getRole());
+        employee.setSupervisor(Strings.isBlank(payload.getSupervisor()) ? employee.getSupervisor() : payload.getSupervisor());
         employee.setFirstName(Strings.isBlank(payload.getFirstName()) ? employee.getFirstName() : payload.getFirstName());
         employee.setLastName(Strings.isBlank(payload.getLastName()) ? employee.getLastName() : payload.getLastName());
         employee.setEmail(Strings.isBlank(payload.getEmail()) ? employee.getEmail() : payload.getEmail());

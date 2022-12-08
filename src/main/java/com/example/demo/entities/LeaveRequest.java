@@ -28,6 +28,9 @@ public class LeaveRequest implements Serializable {
     @NotNull
     private Date createdAt;
 
+    @NotNull
+    private Date updatedAt;
+
     @DocumentReference(lazy=true)
     private Employee employee;
 }

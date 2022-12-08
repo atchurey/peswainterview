@@ -7,7 +7,7 @@ import java.io.Serializable;
 @Data
 public class LeaveDto implements Serializable {
 
-    public String id;
+    private String id;
     private String approvedBy;
     public String reason;
     private String startAt;

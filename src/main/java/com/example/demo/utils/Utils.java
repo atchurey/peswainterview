@@ -46,6 +46,15 @@ public class Utils {
         return dto;
     }
 
+    public static LocalDate toLocalDate(final String date, final String dateFormat) {
+        try {
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateFormat);
+            return  LocalDate.parse(date, dtf);
+        } catch (Exception ex) {
+            throw new ServiceException(100, ex.getMessage());
+        }
+    }
+
     public static String plusDays(final String date, final String dateFormat, int daysToAdd) {
         try {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateFormat);

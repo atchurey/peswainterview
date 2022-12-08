@@ -62,6 +62,19 @@ public class GlobalExceptionAdvice extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, baseError, headers, status, request);
     }
 
+    @ExceptionHandler(value = DataIntegrityViolationException.class)
+    public final ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
+        HttpHeaders headers = new HttpHeaders();
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        BaseError baseError = new BaseError();
+        baseError.setUrl(getUrl(request));
+        baseError.setErrorCode(HttpStatus.CONFLICT.value());
+        baseError.setErrorMessage(ex.getMessage());
+
+        return handleExceptionInternal(ex, baseError, headers, status, request);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         Map<String, String> errors = new HashMap<>();
