@@ -230,10 +230,23 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     public LeaveDto approveLeaveRequest(ApproveLeaveRequestDto payload) {
 
         LeaveRequest leaveRequest = getLeaveRequestById(payload.getId());
-        Employee employee = leaveRequest.getEmployee();
 
         Employee supervisor = employeeRepository.findById(payload.getSupervisor())
                 .orElseThrow(() -> new ServiceException(100, "Supervisor not found"));
+
+        LeaveStatus status = payload.isApprove() ? LeaveStatus.APPROVED : LeaveStatus.DISAPPROVED;
+
+        return approveLeaveRequest(leaveRequest, supervisor, status);
+    }
+
+    //@Override
+    public LeaveDto approveLeaveRequest(LeaveRequest leaveRequest, Employee supervisor, LeaveStatus status) {
+
+        //LeaveRequest leaveRequest = getLeaveRequestById(payload.getId());
+        Employee employee = leaveRequest.getEmployee();
+
+        /*Employee supervisor = employeeRepository.findById(payload.getSupervisor())
+                .orElseThrow(() -> new ServiceException(100, "Supervisor not found"));*/
 
         if (Role.SUPERVISOR != supervisor.getRole()) {
             throw new ServiceException(100, "Only employees with SUPERVISOR role can perform this action.");
@@ -247,7 +260,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         Date now = new Date();
 
         Leave leave = new Leave();
-        leave.setStatus(payload.isApprove() ? LeaveStatus.APPROVED : LeaveStatus.DISAPPROVED);
+        leave.setStatus(status);
         leave.setAttendedToBy(supervisor.getId());
         leave.setReason(leaveRequest.getReason());
         leave.setStartAt(leaveRequest.getStartAt());

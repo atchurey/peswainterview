@@ -1,5 +1,5 @@
 package com.example.demo.enums;
 
 public enum LeaveStatus {
-    APPROVED, DISAPPROVED, CANCELED
+    APPROVED, AUTO_APPROVED, DISAPPROVED, CANCELED
 }
