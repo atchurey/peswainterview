@@ -239,14 +239,9 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         return approveLeaveRequest(leaveRequest, supervisor, status);
     }
 
-    //@Override
     public LeaveDto approveLeaveRequest(LeaveRequest leaveRequest, Employee supervisor, LeaveStatus status) {
 
-        //LeaveRequest leaveRequest = getLeaveRequestById(payload.getId());
         Employee employee = leaveRequest.getEmployee();
-
-        /*Employee supervisor = employeeRepository.findById(payload.getSupervisor())
-                .orElseThrow(() -> new ServiceException(100, "Supervisor not found"));*/
 
         if (Role.SUPERVISOR != supervisor.getRole()) {
             throw new ServiceException(100, "Only employees with SUPERVISOR role can perform this action.");
@@ -289,7 +284,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
             ////// Notify Employee
             String employeeNotification = "Your leave request was "
                     + leave.getStatus().name().toLowerCase()
-                    + "by "
+                    + " by "
                     + supervisor.getFirstName() + " " + supervisor.getLastName();
 
             // Sms notification
@@ -312,7 +307,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
             ////// Notify supervisor
             String supervisorNotification = "You "
                     + leave.getStatus().name().toLowerCase()
-                    + " a leave request from"
+                    + " a leave request from "
                     + employee.getFirstName() + " " + employee.getLastName();
 
             // Sms notification

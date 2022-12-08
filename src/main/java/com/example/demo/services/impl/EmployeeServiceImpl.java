@@ -61,6 +61,8 @@ public class EmployeeServiceImpl implements EmployeeService {
             if (Role.SUPERVISOR != supervisor.getRole()) {
                 throw new ServiceException(100, "Invalid employee provided as supervisor.");
             }
+        } else if (Role.SUPERVISOR != payload.getRole()) {
+            throw new ServiceException(100, "Employees with role other than SUPERVISOR should be assigned a supervisor.");
         }
 
         Date now = new Date();
@@ -75,6 +77,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setCreatedAt(now);
         employee.setUpdatedAt(now);
         employee = employeeRepository.save(employee);
+
+        // Employees with SUPERVISOR ROLE who were not assigned a supervisor
+        // will by default be their own supervisor
+        if(Strings.isBlank(employee.getSupervisor())) {
+            employee.setSupervisor(employee.getId());
+            employee = employeeRepository.save(employee);
+        }
 
         return modelMapper.map(employee, EmployeeDto.class);
     }
@@ -104,7 +113,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         employee.setRole(payload.getRole() == null ? employee.getRole() : payload.getRole());
-        employee.setSupervisor(payload.getSupervisor());
+        employee.setSupervisor(Strings.isBlank(payload.getSupervisor()) ? employee.getSupervisor() : payload.getSupervisor());
         employee.setFirstName(Strings.isBlank(payload.getFirstName()) ? employee.getFirstName() : payload.getFirstName());
         employee.setLastName(Strings.isBlank(payload.getLastName()) ? employee.getLastName() : payload.getLastName());
         employee.setEmail(Strings.isBlank(payload.getEmail()) ? employee.getEmail() : payload.getEmail());

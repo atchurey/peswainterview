@@ -1,21 +1,11 @@
 package com.example.demo;
 
-import com.example.demo.configs.properties.AppProperties;
-import com.example.demo.dtos.EmailPayloadDto;
-import com.example.demo.dtos.SmsPayloadDto;
 import com.example.demo.entities.Employee;
 import com.example.demo.entities.LeaveRequest;
 import com.example.demo.enums.Role;
-import com.example.demo.enums.SmsProvider;
-import com.example.demo.notifications.channels.EmailChannel;
-import com.example.demo.notifications.channels.SmsChannel;
-import com.example.demo.notifications.messageclients.EmailClient;
-import com.example.demo.notifications.messageclients.GiantSmsClient;
-import com.example.demo.notifications.messageclients.TwilioClient;
 import com.example.demo.repositories.EmployeeRepository;
 import com.example.demo.repositories.LeaveRepository;
 import com.example.demo.repositories.LeaveRequestRepository;
-import com.example.demo.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +18,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -37,7 +26,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @EnableScheduling
 @SpringBootApplication
 public class DemoApplication implements CommandLineRunner {
-	private static final Logger logger = LoggerFactory.getLogger(GiantSmsClient.class);
+	private static final Logger logger = LoggerFactory.getLogger(DemoApplication.class);
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
@@ -45,18 +34,6 @@ public class DemoApplication implements CommandLineRunner {
 	private LeaveRequestRepository leaveRequestRepository;
 	@Autowired
 	private LeaveRepository leaveRepository;
-	@Autowired
-	private SmsChannel smsChannel;
-	@Autowired
-	private EmailChannel emailChannel;
-	@Autowired
-	private EmailClient emailClient;
-	@Autowired
-	private TwilioClient twilioClient;
-	@Autowired
-	private GiantSmsClient giantSmsClient;
-	@Autowired
-	private AppProperties appProperties;
 
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
@@ -65,7 +42,7 @@ public class DemoApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		Date nowDate = new Date();
+		/*Date nowDate = new Date();
 		LocalDate nowLocalDate = LocalDate.now(ZoneId.systemDefault());
 
 		employeeRepository.deleteAll();
@@ -80,7 +57,7 @@ public class DemoApplication implements CommandLineRunner {
 		employee1.setEmail("victor@gmail.com");
 		employee1.setPhone("233241500723");
 		employee1.setRole(Role.SUPERVISOR);
-		employee1.setSupervisor(null);
+		employee1.setSupervisor("one");
 		employee1.setCreatedAt(nowDate);
 		employee1.setUpdatedAt(nowDate);
 		employee1 = employeeRepository.save(employee1);
@@ -99,7 +76,7 @@ public class DemoApplication implements CommandLineRunner {
 
 		List<Employee> employees = Arrays.asList(employee1, employee2);
 
-		for (int i = 0; i <= 10; i++) {
+		for (int i = 0; i <= 2; i++) {
 			LeaveRequest leaveRequest = new LeaveRequest();
 			leaveRequest.setId(String.valueOf(i));
 			leaveRequest.setReason("Some reason " + i);
@@ -120,33 +97,7 @@ public class DemoApplication implements CommandLineRunner {
 
 		for (LeaveRequest leaveRequest : employeeRepository.findById("two").get().getLeaveRequests()) {
 			logger.info(">>> Employee Two LeaveRequest: {}", leaveRequest);
-		}
-
-
-		/// Send sms
-		/*SmsPayloadDto smsPayload = new SmsPayloadDto();
-		smsPayload.setFrom(appProperties.getSendSmsAs());
-		smsPayload.setTitle("New Message");
-		smsPayload.setMessage("Hello");
-		smsPayload.setToPhoneNumbers(Collections.singletonList("233540597186"));
-		smsChannel.process(smsPayload);*/
-
-		/*SmsProvider providerToUser = SmsProvider.getByCode(appProperties.getGiantSmsApiBaseUrl());
-		if (SmsProvider.TWILIO == providerToUser) {
-			//smsChannel.sendMessage(twilioClient);
-		} else {
-			//smsChannel.sendMessage(giantSmsClient);
 		}*/
-
-		// Send email
-		/*EmailPayloadDto emailPayload = new EmailPayloadDto();
-		emailPayload.setSubject("New Email");
-		emailPayload.setToEmails(Collections.singletonList("atchureyalbert@gmail.com"));
-		emailPayload.setMessage("Hello");*/
-
-		/*emailChannel.process(emailPayload);
-		//emailChannel.sendMessage(emailClient);*/
-
 	}
 
 

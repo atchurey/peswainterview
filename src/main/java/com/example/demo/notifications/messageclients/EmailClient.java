@@ -44,10 +44,12 @@ public class EmailClient implements MessageClient {
 
             emailSender.send(message);
         } catch (ServiceException ex ) {
-            ex.printStackTrace();
+            logger.error(">>> EmailClient: {}", ex.getMessage());
+            //ex.printStackTrace();
             throw  ex;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            //ex.printStackTrace();
+            logger.error(">>> EmailClient: {}", ex.getMessage());
         }
     }
 

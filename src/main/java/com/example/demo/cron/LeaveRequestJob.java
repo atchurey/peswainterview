@@ -31,7 +31,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collections;
-import java.util.Date;
 
 @Service
 public class LeaveRequestJob {
@@ -60,64 +59,70 @@ public class LeaveRequestJob {
     @Autowired
     private AppProperties appProperties;
 
-    @Scheduled(cron = "0/10 * * * * ?")// Every 30 seconds
+    @Scheduled(cron = "0 0/2 * * * ?")// Every 2 minutes
     //@Scheduled(cron = "${com.example.demo.system.config.leaveRequestCronInterval}")
     public void run()  {
         logger.info(">>> LeaveRequestJob.run() called");
 
-        Date nowDate = new Date();
         LocalDate nowLocalDate = LocalDate.now(ZoneId.systemDefault());
 
         Query query = new Query(Criteria.where("endAt").gt(nowLocalDate));
         mongoTemplate.stream(query, LeaveRequest.class)
                         .forEach(leaveRequest -> {
-                            logger.info(">>> Processing LeaveRequest: {}", leaveRequest);
+                            try {
+                                logger.info(">>> Processing LeaveRequest: {}", leaveRequest);
 
-                            long daysToStartDate = Duration.between(leaveRequest.getStartAt().atStartOfDay(), nowLocalDate.atStartOfDay()).toDays();
+                                long daysToStartDate = Duration.between(nowLocalDate.atStartOfDay(), leaveRequest.getStartAt().atStartOfDay()).toDays();
 
-                            if (daysToStartDate > 3) {
-                                //// Notify supervisor
-                                try {
-                                    SmsProvider providerToUser = SmsProvider.getByCode(appProperties.getSmsClientToUse());
-                                    MessageClient smsClientToUse;
-                                    if (SmsProvider.TWILIO == providerToUser) {
-                                        smsClientToUse = twilioClient;
-                                    } else {
-                                        smsClientToUse = giantSmsClient;
+                                if (daysToStartDate > 3) {
+                                    //// Notify supervisor
+                                    try {
+                                        SmsProvider providerToUser = SmsProvider.getByCode(appProperties.getSmsClientToUse());
+                                        MessageClient smsClientToUse;
+                                        if (SmsProvider.TWILIO == providerToUser) {
+                                            smsClientToUse = twilioClient;
+                                        } else {
+                                            smsClientToUse = giantSmsClient;
+                                        }
+
+                                        ////// Notify Supervisor
+                                        Employee supervisor = employeeRepository.findById(leaveRequest.getEmployee().getSupervisor())
+                                                .orElseThrow(() -> new ServiceException(100, "Supervisor not found"));
+
+                                        String supervisorNotification = leaveRequest.getEmployee().getFirstName() + " " + leaveRequest.getEmployee().getLastName()
+                                                + " has a leave request pending your attention.";
+
+                                        // Sms notification
+                                        SmsPayloadDto smsPayload = new SmsPayloadDto();
+                                        smsPayload.setFrom(appProperties.getSendSmsAs());
+                                        smsPayload.setTitle("Pending Leave Request");
+                                        smsPayload.setMessage(supervisorNotification);
+                                        smsPayload.setToPhoneNumbers(Collections.singletonList(supervisor.getPhone()));
+                                        smsChannel.process(smsPayload);
+                                        smsChannel.sendMessage(smsClientToUse);
+
+                                        // Email notification
+                                        EmailPayloadDto emailPayload = new EmailPayloadDto();
+                                        emailPayload.setSubject("Pending Leave Request");
+                                        emailPayload.setToEmails(Collections.singletonList(supervisor.getEmail()));
+                                        emailPayload.setMessage(supervisorNotification);
+                                        emailChannel.process(emailPayload);
+                                        emailChannel.sendMessage(emailClient);
+                                    } catch (Exception ex) {
+                                        logger.info(">>> Error sending supervisor notification with {} days to start date: {}", daysToStartDate, ex.getMessage());
                                     }
+                                } else {
+                                    try {
+                                        Employee supervisor = employeeRepository.findById(leaveRequest.getEmployee().getSupervisor())
+                                                .orElseThrow(() -> new ServiceException(100, "Supervisor not found"));
 
-                                    ////// Notify Supervisor
-                                    Employee supervisor = employeeRepository.findById(leaveRequest.getEmployee().getSupervisor())
-                                            .orElseThrow(() -> new ServiceException(100, "Supervisor not found"));
-
-                                    String supervisorNotification = leaveRequest.getEmployee().getFirstName() + " " + leaveRequest.getEmployee().getLastName()
-                                            + " has a leave request pending your attention.";
-
-                                    // Sms notification
-                                    SmsPayloadDto smsPayload = new SmsPayloadDto();
-                                    smsPayload.setFrom(appProperties.getSendSmsAs());
-                                    smsPayload.setTitle("Pending Leave Request");
-                                    smsPayload.setMessage(supervisorNotification);
-                                    smsPayload.setToPhoneNumbers(Collections.singletonList(supervisor.getPhone()));
-                                    smsChannel.process(smsPayload);
-                                    smsChannel.sendMessage(smsClientToUse);
-
-                                    // Email notification
-                                    EmailPayloadDto emailPayload = new EmailPayloadDto();
-                                    emailPayload.setSubject("Pending Leave Request");
-                                    emailPayload.setToEmails(Collections.singletonList(supervisor.getEmail()));
-                                    emailPayload.setMessage(supervisorNotification);
-                                    emailChannel.process(emailPayload);
-                                    emailChannel.sendMessage(emailClient);
-                                } catch (Exception ex) {
-                                    ex.printStackTrace();
+                                        leaveRequestService.approveLeaveRequest(leaveRequest, supervisor, LeaveStatus.AUTO_APPROVED);
+                                    } catch (Exception ex) {
+                                        logger.info(">>> Error auto approving leave request with {} days to start date: {}", daysToStartDate, ex.getMessage());
+                                    }
                                 }
-                            } else {
-
-                                Employee supervisor = employeeRepository.findById(leaveRequest.getEmployee().getSupervisor())
-                                        .orElseThrow(() -> new ServiceException(100, "Supervisor not found"));
-
-                                leaveRequestService.approveLeaveRequest(leaveRequest, supervisor, LeaveStatus.AUTO_APPROVED);
+                            } catch (Exception ex) {
+                                logger.info(">>> Error processing leave request: {}", leaveRequest);
                             }
                         });
 
