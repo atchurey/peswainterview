@@ -21,7 +21,6 @@ public class EmailChannel implements MessageChannel {
                 messagePayload.setTitle(payload.getSubject());
                 messagePayload.setMessage(payload.getMessage());
                 messagePayload.setTo(payload.getToEmails());
-                messagePayload.setEmailAttachments(payload.getAttachments());
             }
         } catch (Exception ex) {
             onFailure(ex);

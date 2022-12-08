@@ -19,6 +19,8 @@ public class AppProperties implements Serializable {
     private String giantSmsApiUsername;
     private String giantSmsApiPassword;
     private String smsClientToUse;
+    private String sendEmailAs;
+    private String sendSmsAs;
     private List<String> smsClients;
 
 }

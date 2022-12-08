@@ -12,18 +12,23 @@ import com.example.demo.notifications.messageclients.GiantSmsClient;
 import com.example.demo.notifications.messageclients.TwilioClient;
 import com.example.demo.repositories.EmployeeRepository;
 import com.example.demo.repositories.LeaveRequestRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.Date;
 
-@EnableAsync
+@EnableAsync(proxyTargetClass=true)
+@EnableScheduling
 @SpringBootApplication
 public class DemoApplication implements CommandLineRunner {
+	private static final Logger logger = LoggerFactory.getLogger(GiantSmsClient.class);
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
@@ -73,27 +78,32 @@ public class DemoApplication implements CommandLineRunner {
 		employeeRepository.save(employee2);
 
 		// fetch all customers
-		System.out.println("Employees found with findAll():");
-		System.out.println("-------------------------------");
+		//System.out.println("Employees found with findAll():");
+		//System.out.println("-------------------------------");
 		for (Employee employee : employeeRepository.findAll()) {
-			System.out.println(employee);
+			//System.out.println(employee);
 		}
-		System.out.println();
+		//System.out.println();
 
 		// fetch an individual customer
-		System.out.println("Employee found with findById('firstemployee'):");
-		System.out.println("--------------------------------");
-		System.out.println(employeeRepository.findById("firstemployee"));
+		//System.out.println("Employee found with findById('firstemployee'):");
+		//System.out.println("--------------------------------");
+		//System.out.println(employeeRepository.findById("firstemployee"));
 
-		System.out.println("Employees found with findByLastName('Employee'):");
-		System.out.println("--------------------------------");
+		//System.out.println("Employees found with findByLastName('Employee'):");
+		//System.out.println("--------------------------------");
 		for (Employee employee : employeeRepository.findByLastName("Employee")) {
-			System.out.println(employee);
+			//System.out.println(employee);
 		}
 
 
+		logger.info(">>> AppProperties: " + appProperties);
 		/// Send sms
 		SmsPayloadDto smsPayload = new SmsPayloadDto();
+		smsPayload.setFrom(appProperties.getSendSmsAs());
+		smsPayload.setTitle("New Message");
+		smsPayload.setMessage("Hello");
+		smsPayload.setToPhoneNumbers(Collections.singletonList("233540597186"));
 		smsChannel.process(smsPayload);
 
 		SmsProvider providerToUser = SmsProvider.getByCode(appProperties.getGiantSmsApiBaseUrl());
@@ -105,6 +115,10 @@ public class DemoApplication implements CommandLineRunner {
 
 		// Send email
 		EmailPayloadDto emailPayload = new EmailPayloadDto();
+		emailPayload.setSubject("New Email");
+		emailPayload.setToEmails(Collections.singletonList("atchureyalbert@gmail.com"));
+		emailPayload.setMessage("Hello");
+
 		emailChannel.process(emailPayload);
 		emailChannel.sendMessage(emailClient);
 

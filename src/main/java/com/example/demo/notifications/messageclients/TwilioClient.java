@@ -1,5 +1,6 @@
 package com.example.demo.notifications.messageclients;
 
+import com.example.demo.configs.properties.AppProperties;
 import com.example.demo.domain.MessagePayload;
 import com.example.demo.interfaces.MessageClient;
 import com.twilio.Twilio;
@@ -9,7 +10,7 @@ import com.twilio.type.PhoneNumber;
 import org.apache.http.util.TextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -20,24 +21,18 @@ public class TwilioClient implements MessageClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TwilioClient.class);
 
-    @Value("${TWILIO_PHONE_NUMBER}")
-    private String TWILIO_PHONE_NUMBER;
-
-    @Value("${TWILIO_ACCOUNT_SID}")
-    private String TWILIO_ACCOUNT_SID;
-
-    @Value("${TWILIO_AUTH_TOKEN}")
-    private String TWILIO_AUTH_TOKEN;
+    @Autowired
+    private AppProperties appProperties;
 
     @Async("smsExecutor")
     @Override
     public void send(MessagePayload messagePayload) throws TwilioException {
-        Twilio.init(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+        Twilio.init(appProperties.getTwilioAccountSID(), appProperties.getTwilioAuthToken());
 
         PhoneNumber originNumber;
 
         if (TextUtils.isEmpty(messagePayload.getFrom())) {
-            originNumber = new PhoneNumber(TWILIO_PHONE_NUMBER);
+            originNumber = new PhoneNumber(appProperties.getTwilioPhoneNumber());
         } else {
             originNumber = new PhoneNumber(messagePayload.getFrom());
         }

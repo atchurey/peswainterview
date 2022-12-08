@@ -1,5 +1,6 @@
 package com.example.demo.notifications.messageclients;
 
+import com.example.demo.configs.properties.AppProperties;
 import com.example.demo.domain.MessagePayload;
 import com.example.demo.exceptions.ServiceException;
 import com.example.demo.interfaces.MessageClient;
@@ -7,7 +8,6 @@ import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -20,8 +20,8 @@ public class EmailClient implements MessageClient {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailClient.class);
 
-    @Value("${messaging.system.config.emailSender}")
-    private String sendEmailAs;
+    @Autowired
+    private AppProperties appProperties;
     @Autowired
     private JavaMailSender emailSender;
 
@@ -37,7 +37,7 @@ public class EmailClient implements MessageClient {
             List<String> tos = messagePayload.getTo().stream()
                     .map(to -> (String) to).toList();
 
-            helper.setFrom(sendEmailAs);
+            helper.setFrom(appProperties.getSendEmailAs());
             helper.setTo(tos.get(0));
             helper.setText(messagePayload.getMessage());
             helper.setSubject(messagePayload.getTitle());
