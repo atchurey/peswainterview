@@ -59,8 +59,8 @@ public class LeaveRequestJob {
     @Autowired
     private AppProperties appProperties;
 
-    @Scheduled(cron = "0 0/2 * * * ?")// Every 2 minutes
-    //@Scheduled(cron = "${com.example.demo.system.config.leaveRequestCronInterval}")
+    //@Scheduled(cron = "0 0/2 * * * ?")// Every 2 minutes
+    @Scheduled(cron = "${com.example.demo.system.config.leaveRequestCronInterval}")
     public void run()  {
         logger.info(">>> LeaveRequestJob.run() called");
 
