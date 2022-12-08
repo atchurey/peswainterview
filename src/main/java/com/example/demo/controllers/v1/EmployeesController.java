@@ -105,16 +105,4 @@ public class EmployeesController {
         return response;
     }
 
-    @DeleteMapping("/{id}")
-    @ResponseBody
-    public ApiResponse<EmployeeDto> deleteEmployeeById(@PathVariable String id){
-        logger.info("HTTP REQUEST: deleteEmployeeById: {}", id);
-        employeeService.deleteEmployee(id);
-
-        ApiResponse<EmployeeDto> response = Utils.wrapInApiResponse(null);
-
-        logger.info("HTTP RESPONSE: deleteEmployeeById: {}", response);
-        return response;
-    }
-
 }

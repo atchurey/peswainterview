@@ -33,6 +33,9 @@ public class Employee implements Serializable {
     @NotNull
     private Date createdAt;
 
+    @NotNull
+    private Date updatedAt;
+
     @DocumentReference
     private List<Leave> leaves;
 

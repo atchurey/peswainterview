@@ -4,6 +4,8 @@ import com.example.demo.domain.ApiResponse;
 import com.example.demo.domain.PagedContent;
 import com.example.demo.enums.ResponseMessage;
 import com.example.demo.exceptions.ServiceException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 
@@ -78,6 +80,12 @@ public class Utils {
         } catch (Exception ex) {
             throw new ServiceException(100, ex.getMessage());
         }
+    }
+
+    public static String internationalizePhoneNumber(String countryCode, String phone) throws Exception {
+        PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+        Phonenumber.PhoneNumber phoneNumber = phoneUtil.parse(phone, countryCode);
+        return phoneUtil.format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL).replace(" ", "").replace("+", "");
     }
 
 }

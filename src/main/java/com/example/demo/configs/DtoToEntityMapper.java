@@ -1,8 +1,10 @@
 package com.example.demo.configs;
 
 import com.example.demo.dtos.EmployeeDto;
+import com.example.demo.dtos.LeaveDto;
 import com.example.demo.dtos.LeaveRequestDto;
 import com.example.demo.entities.Employee;
+import com.example.demo.entities.Leave;
 import com.example.demo.entities.LeaveRequest;
 import org.modelmapper.*;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +32,11 @@ public class DtoToEntityMapper {
             }
         };
 
+        PropertyMap<Leave, LeaveDto> leaveMap = new PropertyMap<>() {
+            protected void configure() {
+            }
+        };
+
         Converter<Date, String> timestampStringConverter = new AbstractConverter<>() {
             protected String convert(Date source) {
 
@@ -53,6 +60,8 @@ public class DtoToEntityMapper {
 
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addMappings(employeeMap);
+        modelMapper.addMappings(leaveRequestMap);
+        modelMapper.addMappings(leaveMap);
 
         modelMapper.addConverter(timestampStringConverter);
         modelMapper.addConverter(stringTimeStampConverter);

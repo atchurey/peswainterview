@@ -13,6 +13,4 @@ public interface EmployeeService {
     Page<Employee> getAllEmployees(Pageable pageable);
     EmployeeDto createEmployee(CreateEmployeeDto payload);
     EmployeeDto updateEmployee(UpdateEmployeeDto payload);
-    void deleteEmployee(String id);
-
 }
