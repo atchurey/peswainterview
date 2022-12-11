@@ -1,0 +1,14 @@
+
+= Leave Request Service API
+
+== Get an employee
+operation::employees-controller/get-employee-by-id[snippets='http-request,curl-request,http-response,response-fields']
+
+== Get all employees
+operation::employees-controller/get-all-employees[snippets='http-request,curl-request,query-parameters,http-response,response-fields']
+
+== Create an employee
+operation::employees-controller/create-employee[snippets='http-request,curl-request,request-fields,http-response,response-fields']
+
+== Update an employee
+operation::employees-controller/update-employee[snippets='http-request,curl-request,request-fields,http-response,response-fields']

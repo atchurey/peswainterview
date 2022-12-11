@@ -59,8 +59,8 @@ public class LeaveRequestJob {
     @Autowired
     private AppProperties appProperties;
 
-    //@Scheduled(cron = "0 0/2 * * * ?")// Every 2 minutes
-    @Scheduled(cron = "${com.example.demo.system.config.leaveRequestCronInterval}")
+    @Scheduled(cron = "0 0/2 * * * ?")// Every 2 minutes
+    //@Scheduled(cron = "${com.example.demo.system.config.leaveRequestCronInterval}")
     public void run()  {
         logger.info(">>> LeaveRequestJob.run() called");
 
@@ -92,7 +92,9 @@ public class LeaveRequestJob {
                                         String supervisorNotification = leaveRequest.getEmployee().getFirstName() + " " + leaveRequest.getEmployee().getLastName()
                                                 + " has a leave request pending your attention.";
 
-                                        // Sms notification
+                                        logger.info(">>> Notifying supervisor: {} ", supervisorNotification);
+
+                                        /*// Sms notification
                                         SmsPayloadDto smsPayload = new SmsPayloadDto();
                                         smsPayload.setFrom(appProperties.getSendSmsAs());
                                         smsPayload.setTitle("Pending Leave Request");
@@ -107,7 +109,7 @@ public class LeaveRequestJob {
                                         emailPayload.setToEmails(Collections.singletonList(supervisor.getEmail()));
                                         emailPayload.setMessage(supervisorNotification);
                                         emailChannel.process(emailPayload);
-                                        emailChannel.sendMessage(emailClient);
+                                        emailChannel.sendMessage(emailClient);*/
                                     } catch (Exception ex) {
                                         logger.info(">>> Error sending supervisor notification with {} days to start date: {}", daysToStartDate, ex.getMessage());
                                     }

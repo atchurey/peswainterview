@@ -32,21 +32,6 @@ public class EmployeesController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @GetMapping("/search")
-    @ResponseBody
-    public ApiResponse<PagedContent<EmployeeDto>> searchEmployees(Pageable pageable) {
-        logger.info("HTTP Request: searchEmployees");
-        Page<Employee> page = employeeService.getAllEmployees(pageable);
-
-        List<EmployeeDto> dtos = page.stream().map(employee ->
-                modelMapper.map(employee, EmployeeDto.class)).collect(Collectors.toList());
-
-        ApiResponse<PagedContent<EmployeeDto>> response = Utils.wrapInPagedApiResponse(page, dtos);
-
-        logger.info("HTTP Response: searchEmployees: {}", response);
-        return response;
-    }
-
     @GetMapping
     @ResponseBody
     public ApiResponse<PagedContent<EmployeeDto>> getAllEmployees(Pageable pageable) {

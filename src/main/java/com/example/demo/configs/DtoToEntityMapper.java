@@ -23,7 +23,6 @@ public class DtoToEntityMapper {
 
         PropertyMap<Employee, EmployeeDto> employeeMap = new PropertyMap<>() {
             protected void configure() {
-                skip().setLeaveRequests(null);
             }
         };
 

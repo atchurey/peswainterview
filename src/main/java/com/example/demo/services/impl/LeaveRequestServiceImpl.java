@@ -287,7 +287,10 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
                     + " by "
                     + supervisor.getFirstName() + " " + supervisor.getLastName();
 
-            // Sms notification
+            logger.info(">>> Notifying employee: {} ", employeeNotification);
+
+
+            /*// Sms notification
             SmsPayloadDto smsPayload = new SmsPayloadDto();
             smsPayload.setFrom(appProperties.getSendSmsAs());
             smsPayload.setTitle("Leave Approval");
@@ -302,7 +305,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
             emailPayload.setToEmails(Collections.singletonList(employee.getEmail()));
             emailPayload.setMessage(employeeNotification);
             emailChannel.process(emailPayload);
-            emailChannel.sendMessage(emailClient);
+            emailChannel.sendMessage(emailClient);*/
 
             ////// Notify supervisor
             String supervisorNotification = "You "
@@ -310,7 +313,9 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
                     + " a leave request from "
                     + employee.getFirstName() + " " + employee.getLastName();
 
-            // Sms notification
+            logger.info(">>> Notifying supervisor: {} ", supervisorNotification);
+
+            /*// Sms notification
             smsPayload = new SmsPayloadDto();
             smsPayload.setFrom(appProperties.getSendSmsAs());
             smsPayload.setTitle("Leave Approval");
@@ -325,7 +330,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
             emailPayload.setToEmails(Collections.singletonList(supervisor.getEmail()));
             emailPayload.setMessage(supervisorNotification);
             emailChannel.process(emailPayload);
-            emailChannel.sendMessage(emailClient);
+            emailChannel.sendMessage(emailClient);*/
         } catch (Exception ex) {
             ex.printStackTrace();
         }
