@@ -1,20 +1,13 @@
 package com.example.demo.services.impl;
 
-import com.example.demo.configs.properties.AppProperties;
 import com.example.demo.dtos.*;
 import com.example.demo.entities.Employee;
 import com.example.demo.entities.Leave;
 import com.example.demo.entities.LeaveRequest;
 import com.example.demo.enums.LeaveStatus;
 import com.example.demo.enums.Role;
-import com.example.demo.enums.SmsProvider;
 import com.example.demo.exceptions.ServiceException;
-import com.example.demo.interfaces.MessageClient;
-import com.example.demo.notifications.channels.EmailChannel;
-import com.example.demo.notifications.channels.SmsChannel;
-import com.example.demo.notifications.messageclients.EmailClient;
-import com.example.demo.notifications.messageclients.GiantSmsClient;
-import com.example.demo.notifications.messageclients.TwilioClient;
+import com.example.demo.notifications.NotificationService;
 import com.example.demo.repositories.EmployeeRepository;
 import com.example.demo.repositories.LeaveRepository;
 import com.example.demo.repositories.LeaveRequestRepository;
@@ -31,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Collections;
 import java.util.Date;
 
 @Service
@@ -47,17 +39,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
-    private SmsChannel smsChannel;
-    @Autowired
-    private EmailChannel emailChannel;
-    @Autowired
-    private EmailClient emailClient;
-    @Autowired
-    private TwilioClient twilioClient;
-    @Autowired
-    private GiantSmsClient giantSmsClient;
-    @Autowired
-    private AppProperties appProperties;
+    private NotificationService notificationService;
 
     @Autowired
     LeaveRequestServiceImpl(LeaveRequestRepository leaveRequestRepository,
@@ -114,7 +96,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         String supervisorNotification = employee.getFirstName() + " " + employee.getLastName()
                 + " just sent in a leave request.";
 
-        sendNotification("Leave Request",
+        notificationService.sendNotification("Leave Request",
                 supervisorNotification,
                 supervisor.getPhone(),
                 supervisor.getPhone()
@@ -169,7 +151,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         String supervisorNotification = leaveRequest.getEmployee().getFirstName() + " " + leaveRequest.getEmployee().getLastName()
                 + " has updated their leave request.";
 
-        sendNotification("Leave Request Update",
+        notificationService.sendNotification("Leave Request Update",
                 supervisorNotification,
                 supervisor.getPhone(),
                 supervisor.getPhone()
@@ -220,7 +202,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
 
         // Delete all approved or disapproved LeaveRequests
         // This should help manage the size of the LeaveRequests collection
-        // This should positively impact performance of the LeaveRequestJob
+        // which will positively impact performance of the LeaveRequestJob
         leaveRequestRepository.deleteById(leaveRequest.getId());
 
         //Notify employee
@@ -229,7 +211,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
                 + " by "
                 + supervisor.getFirstName() + " " + supervisor.getLastName();
 
-        sendNotification("Leave Approval",
+        notificationService.sendNotification("Leave Approval",
                 employeeNotification,
                 employee.getPhone(),
                 employee.getEmail()
@@ -241,7 +223,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
                 + " a leave request from "
                 + employee.getFirstName() + " " + employee.getLastName();
 
-        sendNotification("Leave Approval",
+        notificationService.sendNotification("Leave Approval",
                 supervisorNotification,
                 supervisor.getPhone(),
                 supervisor.getPhone()
@@ -256,40 +238,6 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
             leaveRequestRepository.deleteById(id);
         } else {
             throw new ServiceException(100, "LeaveRequest not found.");
-        }
-    }
-
-
-    public void sendNotification(String title, String message, String phone, String email) {
-
-        try {
-            SmsProvider providerToUser = SmsProvider.getByCode(appProperties.getSmsClientToUse());
-            MessageClient smsClientToUse;
-            if (SmsProvider.TWILIO == providerToUser) {
-                smsClientToUse = twilioClient;
-            } else {
-                smsClientToUse = giantSmsClient;
-            }
-
-            // Sms notification
-            SmsPayloadDto smsPayload = new SmsPayloadDto();
-            smsPayload.setFrom(appProperties.getSendSmsAs());
-            smsPayload.setTitle(title);
-            smsPayload.setMessage(message);
-            smsPayload.setToPhoneNumbers(Collections.singletonList(phone));
-            smsChannel.process(smsPayload);
-            smsChannel.sendMessage(smsClientToUse);
-
-            // Email notification
-            EmailPayloadDto emailPayload = new EmailPayloadDto();
-            emailPayload.setSubject(title);
-            emailPayload.setToEmails(Collections.singletonList(email));
-            emailPayload.setMessage(message);
-            emailChannel.process(emailPayload);
-            emailChannel.sendMessage(emailClient);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 

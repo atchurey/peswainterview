@@ -1,18 +1,11 @@
 package com.example.demo.cron;
 
-import com.example.demo.configs.properties.AppProperties;
 import com.example.demo.entities.Employee;
 import com.example.demo.entities.LeaveRequest;
 import com.example.demo.enums.LeaveStatus;
 import com.example.demo.exceptions.ServiceException;
-import com.example.demo.notifications.channels.EmailChannel;
-import com.example.demo.notifications.channels.SmsChannel;
-import com.example.demo.notifications.messageclients.EmailClient;
-import com.example.demo.notifications.messageclients.GiantSmsClient;
-import com.example.demo.notifications.messageclients.TwilioClient;
+import com.example.demo.notifications.NotificationService;
 import com.example.demo.repositories.EmployeeRepository;
-import com.example.demo.repositories.LeaveRepository;
-import com.example.demo.repositories.LeaveRequestRepository;
 import com.example.demo.services.impl.LeaveRequestServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,26 +29,11 @@ public class LeaveRequestJob {
     @Autowired
     private EmployeeRepository employeeRepository;
     @Autowired
-    private LeaveRequestRepository leaveRequestRepository;
-    @Autowired
     private LeaveRequestServiceImpl leaveRequestService;
     @Autowired
-    private LeaveRepository leaveRepository;
-    @Autowired
-    private SmsChannel smsChannel;
-    @Autowired
-    private EmailChannel emailChannel;
-    @Autowired
-    private EmailClient emailClient;
-    @Autowired
-    private TwilioClient twilioClient;
-    @Autowired
-    private GiantSmsClient giantSmsClient;
-    @Autowired
-    private AppProperties appProperties;
+    private NotificationService notificationService;
 
-    @Scheduled(cron = "0 0/2 * * * ?")// Every 2 minutes
-    //@Scheduled(cron = "${com.example.demo.system.config.leaveRequestCronInterval}")
+    @Scheduled(cron = "${com.example.demo.system.config.leaveRequestCronInterval}")
     public void run() {
         logger.info(">>> LeaveRequestJob.run() called");
 
@@ -78,7 +56,7 @@ public class LeaveRequestJob {
                             String supervisorNotification = leaveRequest.getEmployee().getFirstName() + " " + leaveRequest.getEmployee().getLastName()
                                     + " has a leave request pending your attention.";
 
-                            leaveRequestService.sendNotification("Pending Leave Request",
+                            notificationService.sendNotification("Pending Leave Request",
                                     supervisorNotification,
                                     supervisor.getPhone(),
                                     supervisor.getPhone()
