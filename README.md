@@ -22,7 +22,7 @@
 - Run integration tests from IDE.
 - Run maven package goal: `./mvnw package`
 - Copy auto-generated `index.html` file from `target/generated-docs` into `src/main/resources/static/docs/` directory.
-- View documentation at [API Documentation](http://localhost:8080/docs/index.html) `http://localhost:8080/docs/index.html`.
+- View [API Documentation](http://localhost:8080/docs/index.html) at `http://localhost:8080/docs/index.html`.
 
 ### Test LeaveRequestJob
 - In application.properties file set `com.example.demo.system.config.leaveRequestCronInterval` to a shorter interval eg. `0 0/2 * * * ?` (every 2 minutes).
