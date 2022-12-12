@@ -39,68 +39,54 @@ public class DemoApplication implements CommandLineRunner {
 		SpringApplication.run(DemoApplication.class, args);
 	}
 
+
+	// Seed db is empty
 	@Override
 	public void run(String... args) throws Exception {
 
-		/*Date nowDate = new Date();
-		LocalDate nowLocalDate = LocalDate.now(ZoneId.systemDefault());
+		// Seed db with two employees and two leave requests
+		if (employeeRepository.count() <= 0) {
 
-		employeeRepository.deleteAll();
-		leaveRequestRepository.deleteAll();
-		leaveRepository.deleteAll();
+			Date nowDate = new Date();
+			LocalDate nowLocalDate = LocalDate.now(ZoneId.systemDefault());
 
-		// save a couple of employees
-		Employee employee1 = new Employee();
-		employee1.setId("one");
-		employee1.setFirstName("Victor");
-		employee1.setLastName("Somuah");
-		employee1.setEmail("victor@gmail.com");
-		employee1.setPhone("233241500723");
-		employee1.setRole(Role.SUPERVISOR);
-		employee1.setSupervisor("one");
-		employee1.setCreatedAt(nowDate);
-		employee1.setUpdatedAt(nowDate);
-		employee1 = employeeRepository.save(employee1);
+			Employee employee1 = new Employee();
+			employee1.setId("one");
+			employee1.setFirstName("Super");
+			employee1.setLastName("Visor");
+			employee1.setEmail("super@visor.com");
+			employee1.setPhone("233540597186");
+			employee1.setRole(Role.SUPERVISOR);
+			employee1.setSupervisor("one");
+			employee1.setCreatedAt(nowDate);
+			employee1.setUpdatedAt(nowDate);
+			employee1 = employeeRepository.save(employee1);
 
-		Employee employee2 = new Employee();
-		employee2.setId("two");
-		employee2.setFirstName("Norbert");
-		employee2.setLastName("Aberor");
-		employee2.setEmail("norbert@gmail.com");
-		employee2.setPhone("233248529145");
-		employee2.setRole(Role.EMPLOYEE);
-		employee2.setSupervisor(employee1.getId());
-		employee2.setCreatedAt(nowDate);
-		employee2.setUpdatedAt(nowDate);
-		employeeRepository.save(employee2);
+			Employee employee2 = new Employee();
+			employee2.setId("two");
+			employee2.setFirstName("Emplo");
+			employee2.setLastName("Yee");
+			employee2.setEmail("emplo@yee.com");
+			employee2.setPhone("233241500723");
+			employee2.setRole(Role.EMPLOYEE);
+			employee2.setSupervisor(employee1.getId());
+			employee2.setCreatedAt(nowDate);
+			employee2.setUpdatedAt(nowDate);
+			employeeRepository.save(employee2);
 
-		List<Employee> employees = Arrays.asList(employee1, employee2);
+			List<Employee> employees = Arrays.asList(employee1, employee2);
 
-		for (int i = 0; i <= 2; i++) {
-			LeaveRequest leaveRequest = new LeaveRequest();
-			leaveRequest.setId(String.valueOf(i));
-			leaveRequest.setReason("Some reason " + i);
-			leaveRequest.setCreatedAt(nowDate);
-			leaveRequest.setUpdatedAt(nowDate);
-			leaveRequest.setStartAt(nowLocalDate.plusDays(ThreadLocalRandom.current().nextInt(1, 20)));
-			leaveRequest.setEndAt(nowLocalDate.plusDays(ThreadLocalRandom.current().nextInt(20, 100)));
-			leaveRequest.setEmployee(employees.get(ThreadLocalRandom.current().nextInt(0, 2)));
-			leaveRequest = leaveRequestRepository.save(leaveRequest);
-			logger.info(">>> Saved LeaveRequest: {}", leaveRequest);
-
+			for (int i = 0; i <= 1; i++) {
+				LeaveRequest leaveRequest = new LeaveRequest();
+				leaveRequest.setId(String.valueOf(i));
+				leaveRequest.setReason("Some reason " + i);
+				leaveRequest.setCreatedAt(nowDate);
+				leaveRequest.setUpdatedAt(nowDate);
+				leaveRequest.setStartAt(nowLocalDate.plusDays(ThreadLocalRandom.current().nextInt(1, 20)));
+				leaveRequest.setEndAt(nowLocalDate.plusDays(ThreadLocalRandom.current().nextInt(20, 100)));
+				leaveRequest.setEmployee(employees.get(ThreadLocalRandom.current().nextInt(0, 2)));
+				leaveRequestRepository.save(leaveRequest);
+			}
 		}
-
-
-		for (LeaveRequest leaveRequest : employeeRepository.findById("one").get().getLeaveRequests()) {
-			logger.info(">>> Employee One LeaveRequest: {}", leaveRequest);
-		}
-
-		for (LeaveRequest leaveRequest : employeeRepository.findById("two").get().getLeaveRequests()) {
-			logger.info(">>> Employee Two LeaveRequest: {}", leaveRequest);
-		}*/
 	}
-
-
-
-
 }
