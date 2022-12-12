@@ -107,42 +107,18 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         leaveRequest = leaveRequestRepository.save(leaveRequest);
 
 
-        ///// Send notifications
-        try {
-            SmsProvider providerToUser = SmsProvider.getByCode(appProperties.getSmsClientToUse());
-            MessageClient smsClientToUse;
-            if (SmsProvider.TWILIO == providerToUser) {
-                smsClientToUse = twilioClient;
-            } else {
-                smsClientToUse = giantSmsClient;
-            }
+        // Notify supervisor
+        Employee supervisor = employeeRepository.findById(employee.getSupervisor())
+                .orElseThrow(() -> new ServiceException(100, "Supervisor not found"));
 
-            ////// Notify Supervisor
-            Employee supervisor = employeeRepository.findById(employee.getSupervisor())
-                    .orElseThrow(() -> new ServiceException(100, "Supervisor not found"));
+        String supervisorNotification = employee.getFirstName() + " " + employee.getLastName()
+                + " just sent in a leave request.";
 
-            String supervisorNotification = employee.getFirstName() + " " + employee.getLastName()
-                    + " just sent in a leave request.";
-
-            // Sms notification
-            SmsPayloadDto smsPayload = new SmsPayloadDto();
-            smsPayload.setFrom(appProperties.getSendSmsAs());
-            smsPayload.setTitle("Leave Request");
-            smsPayload.setMessage(supervisorNotification);
-            smsPayload.setToPhoneNumbers(Collections.singletonList(supervisor.getPhone()));
-            smsChannel.process(smsPayload);
-            smsChannel.sendMessage(smsClientToUse);
-
-            // Email notification
-            EmailPayloadDto emailPayload = new EmailPayloadDto();
-            emailPayload.setSubject("Leave Request");
-            emailPayload.setToEmails(Collections.singletonList(supervisor.getEmail()));
-            emailPayload.setMessage(supervisorNotification);
-            emailChannel.process(emailPayload);
-            emailChannel.sendMessage(emailClient);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        sendNotification("Leave Request",
+                supervisorNotification,
+                supervisor.getPhone(),
+                supervisor.getPhone()
+        );
 
         return modelMapper.map(leaveRequest, LeaveRequestDto.class);
     }
@@ -186,42 +162,18 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         leaveRequest.setUpdatedAt(now);
         leaveRequest = leaveRequestRepository.save(leaveRequest);
 
-        ///// Send notifications
-        try {
-            SmsProvider providerToUser = SmsProvider.getByCode(appProperties.getSmsClientToUse());
-            MessageClient smsClientToUse;
-            if (SmsProvider.TWILIO == providerToUser) {
-                smsClientToUse = twilioClient;
-            } else {
-                smsClientToUse = giantSmsClient;
-            }
+        //Notify supervisor
+        Employee supervisor = employeeRepository.findById(leaveRequest.getEmployee().getSupervisor())
+                .orElseThrow(() -> new ServiceException(100, "Supervisor not found"));
 
-            ////// Notify Supervisor
-            Employee supervisor = employeeRepository.findById(leaveRequest.getEmployee().getSupervisor())
-                    .orElseThrow(() -> new ServiceException(100, "Supervisor not found"));
+        String supervisorNotification = leaveRequest.getEmployee().getFirstName() + " " + leaveRequest.getEmployee().getLastName()
+                + " has updated their leave request.";
 
-            String supervisorNotification = leaveRequest.getEmployee().getFirstName() + " " + leaveRequest.getEmployee().getLastName()
-                    + " has updated their leave request.";
-
-            // Sms notification
-            SmsPayloadDto smsPayload = new SmsPayloadDto();
-            smsPayload.setFrom(appProperties.getSendSmsAs());
-            smsPayload.setTitle("Leave Request Update");
-            smsPayload.setMessage(supervisorNotification);
-            smsPayload.setToPhoneNumbers(Collections.singletonList(supervisor.getPhone()));
-            smsChannel.process(smsPayload);
-            smsChannel.sendMessage(smsClientToUse);
-
-            // Email notification
-            EmailPayloadDto emailPayload = new EmailPayloadDto();
-            emailPayload.setSubject("Leave Request Update");
-            emailPayload.setToEmails(Collections.singletonList(supervisor.getEmail()));
-            emailPayload.setMessage(supervisorNotification);
-            emailChannel.process(emailPayload);
-            emailChannel.sendMessage(emailClient);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        sendNotification("Leave Request Update",
+                supervisorNotification,
+                supervisor.getPhone(),
+                supervisor.getPhone()
+        );
 
         return modelMapper.map(leaveRequest, LeaveRequestDto.class);
     }
@@ -271,69 +223,29 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         // This should positively impact performance of the LeaveRequestJob
         leaveRequestRepository.deleteById(leaveRequest.getId());
 
-        ///// Send notifications
-        try {
-            SmsProvider providerToUser = SmsProvider.getByCode(appProperties.getSmsClientToUse());
-            MessageClient smsClientToUse;
-            if (SmsProvider.TWILIO == providerToUser) {
-                smsClientToUse = twilioClient;
-            } else {
-                smsClientToUse = giantSmsClient;
-            }
+        //Notify employee
+        String employeeNotification = "Your leave request was "
+                + leave.getStatus().name().toLowerCase()
+                + " by "
+                + supervisor.getFirstName() + " " + supervisor.getLastName();
 
-            ////// Notify Employee
-            String employeeNotification = "Your leave request was "
-                    + leave.getStatus().name().toLowerCase()
-                    + " by "
-                    + supervisor.getFirstName() + " " + supervisor.getLastName();
+        sendNotification("Leave Approval",
+                employeeNotification,
+                employee.getPhone(),
+                employee.getEmail()
+        );
 
-            logger.info(">>> Notifying employee: {} ", employeeNotification);
+        //Notify supervisor
+        String supervisorNotification = "You "
+                + leave.getStatus().name().toLowerCase()
+                + " a leave request from "
+                + employee.getFirstName() + " " + employee.getLastName();
 
-
-            /*// Sms notification
-            SmsPayloadDto smsPayload = new SmsPayloadDto();
-            smsPayload.setFrom(appProperties.getSendSmsAs());
-            smsPayload.setTitle("Leave Approval");
-            smsPayload.setMessage(employeeNotification);
-            smsPayload.setToPhoneNumbers(Collections.singletonList(employee.getPhone()));
-            smsChannel.process(smsPayload);
-            smsChannel.sendMessage(smsClientToUse);
-
-            // Email notification
-            EmailPayloadDto emailPayload = new EmailPayloadDto();
-            emailPayload.setSubject("Leave Approval");
-            emailPayload.setToEmails(Collections.singletonList(employee.getEmail()));
-            emailPayload.setMessage(employeeNotification);
-            emailChannel.process(emailPayload);
-            emailChannel.sendMessage(emailClient);*/
-
-            ////// Notify supervisor
-            String supervisorNotification = "You "
-                    + leave.getStatus().name().toLowerCase()
-                    + " a leave request from "
-                    + employee.getFirstName() + " " + employee.getLastName();
-
-            logger.info(">>> Notifying supervisor: {} ", supervisorNotification);
-
-            /*// Sms notification
-            smsPayload = new SmsPayloadDto();
-            smsPayload.setFrom(appProperties.getSendSmsAs());
-            smsPayload.setTitle("Leave Approval");
-            smsPayload.setMessage(supervisorNotification);
-            smsPayload.setToPhoneNumbers(Collections.singletonList(supervisor.getPhone()));
-            smsChannel.process(smsPayload);
-            smsChannel.sendMessage(smsClientToUse);
-
-            // Email notification
-            emailPayload = new EmailPayloadDto();
-            emailPayload.setSubject("Leave Approval");
-            emailPayload.setToEmails(Collections.singletonList(supervisor.getEmail()));
-            emailPayload.setMessage(supervisorNotification);
-            emailChannel.process(emailPayload);
-            emailChannel.sendMessage(emailClient);*/
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        sendNotification("Leave Approval",
+                supervisorNotification,
+                supervisor.getPhone(),
+                supervisor.getPhone()
+        );
 
         return modelMapper.map(leave, LeaveDto.class);
     }
@@ -344,6 +256,40 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
             leaveRequestRepository.deleteById(id);
         } else {
             throw new ServiceException(100, "LeaveRequest not found.");
+        }
+    }
+
+
+    public void sendNotification(String title, String message, String phone, String email) {
+
+        try {
+            SmsProvider providerToUser = SmsProvider.getByCode(appProperties.getSmsClientToUse());
+            MessageClient smsClientToUse;
+            if (SmsProvider.TWILIO == providerToUser) {
+                smsClientToUse = twilioClient;
+            } else {
+                smsClientToUse = giantSmsClient;
+            }
+
+            // Sms notification
+            SmsPayloadDto smsPayload = new SmsPayloadDto();
+            smsPayload.setFrom(appProperties.getSendSmsAs());
+            smsPayload.setTitle(title);
+            smsPayload.setMessage(message);
+            smsPayload.setToPhoneNumbers(Collections.singletonList(phone));
+            smsChannel.process(smsPayload);
+            smsChannel.sendMessage(smsClientToUse);
+
+            // Email notification
+            EmailPayloadDto emailPayload = new EmailPayloadDto();
+            emailPayload.setSubject(title);
+            emailPayload.setToEmails(Collections.singletonList(email));
+            emailPayload.setMessage(message);
+            emailChannel.process(emailPayload);
+            emailChannel.sendMessage(emailClient);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
